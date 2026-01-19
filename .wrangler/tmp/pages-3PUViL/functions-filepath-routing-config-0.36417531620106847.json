@@ -1,0 +1,45 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/lottery",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/lottery.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/lottery",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/lottery.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/reset",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/reset.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/reset",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/reset.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/results",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/results.js:onRequestGet"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}
