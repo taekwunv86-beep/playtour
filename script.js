@@ -1,42 +1,78 @@
-// 플레이투어 추첨 프로그램 - 메인 스크립트
+// 플레이투어 추첨 프로그램 - 메인 스크립트 (서버 DB 연동)
 
 // 데이터 정의
 const MEMBERS = ['K', 'W', 'G', 'P', 'Z', 'C', 'M', 'V', 'J', 'I', 'R', 'U', 'O', 'S', 'Q', 'N', 'F', 'Y'];
 const MONTHS = ['2월', '4월', '5월', '6월', '8월', '11월'];
 const MEMBERS_PER_MONTH = 3; // 18명 / 6개월 = 3명씩
 
+// API 베이스 URL
+const API_BASE = '/api';
+
 // 상태 관리
 let selectedMember = null;
 let isSpinning = false;
+let cachedResults = null;
 
-// localStorage 키
-const STORAGE_KEY = 'playtour_lottery_results';
+// 서버에서 결과 조회
+async function getResults() {
+    try {
+        const response = await fetch(`${API_BASE}/results`);
+        const data = await response.json();
 
-// 결과 데이터 구조
-function getResults() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-        return JSON.parse(stored);
+        if (data.success) {
+            // monthCounts를 배열 형태로 변환
+            const monthCounts = {};
+            MONTHS.forEach(m => {
+                monthCounts[m] = data.monthCounts[m] || [];
+            });
+
+            cachedResults = {
+                assignments: data.assignments || {},
+                monthCounts
+            };
+            return cachedResults;
+        }
+    } catch (error) {
+        console.error('결과 조회 실패:', error);
     }
-    // 초기화
+
+    // 실패 시 빈 결과 반환
     return {
-        assignments: {}, // { memberName: assignedMonth }
+        assignments: {},
         monthCounts: MONTHS.reduce((acc, m) => ({ ...acc, [m]: [] }), {})
     };
 }
 
-function saveResults(results) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+// 서버에 추첨 요청
+async function submitLottery(member) {
+    try {
+        const response = await fetch(`${API_BASE}/lottery`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ member })
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('추첨 요청 실패:', error);
+        return { success: false, error: error.message };
+    }
 }
 
 // 페이지 초기화 (메인 페이지)
-function initMainPage() {
+async function initMainPage() {
     const memberGrid = document.getElementById('memberGrid');
     const monthStatus = document.getElementById('monthStatus');
 
     if (!memberGrid) return; // admin 페이지에서는 실행 안함
 
-    const results = getResults();
+    // 로딩 표시
+    memberGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">로딩 중...</div>';
+
+    const results = await getResults();
 
     // 멤버 버튼 생성
     memberGrid.innerHTML = '';
@@ -104,27 +140,6 @@ function renderMonthStatus(results) {
     });
 }
 
-// 배정 가능한 월 계산 (균등 배분)
-function getAvailableMonths(results) {
-    // 각 월의 현재 인원 수
-    const counts = MONTHS.map(month => ({
-        month,
-        count: (results.monthCounts[month] || []).length
-    }));
-
-    // 최소 인원 수 찾기
-    const minCount = Math.min(...counts.map(c => c.count));
-
-    // 최소 인원인 월들만 반환 (균등 배분)
-    const available = counts
-        .filter(c => c.count === minCount && c.count < MEMBERS_PER_MONTH)
-        .map(c => c.month);
-
-    return available.length > 0 ? available : MONTHS.filter(m =>
-        (results.monthCounts[m] || []).length < MEMBERS_PER_MONTH
-    );
-}
-
 // 슬롯머신 효과음 생성 (Web Audio API)
 function createSpinSound() {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -190,19 +205,31 @@ async function startSpin() {
         spinSound = createSpinSound();
     }
 
-    const results = getResults();
-    const availableMonths = getAvailableMonths(results);
+    // 서버에 추첨 요청 (먼저 결과를 받아옴)
+    const lotteryResult = await submitLottery(selectedMember);
 
-    if (availableMonths.length === 0) {
-        alert('모든 월이 가득 찼습니다!');
+    if (!lotteryResult.success) {
+        alert(lotteryResult.error || '추첨에 실패했습니다.');
         isSpinning = false;
         spinButton.disabled = false;
         spinButton.classList.remove('spinning');
+
+        // 이미 추첨한 멤버인 경우 UI 업데이트
+        if (lotteryResult.assigned_month) {
+            const selectedBtn = document.querySelector(`.member-btn[data-member="${selectedMember}"]`);
+            if (selectedBtn) {
+                selectedBtn.disabled = true;
+                selectedBtn.classList.remove('selected');
+                selectedBtn.classList.add('completed');
+                selectedBtn.title = `${selectedMember}: ${lotteryResult.assigned_month} 배정됨`;
+            }
+            selectedMember = null;
+            document.getElementById('selectedMemberName').textContent = '-';
+        }
         return;
     }
 
-    // 결과 월 랜덤 선택
-    const resultMonth = availableMonths[Math.floor(Math.random() * availableMonths.length)];
+    const resultMonth = lotteryResult.assigned_month;
 
     // 슬롯머신 애니메이션
     const totalSpins = 30 + Math.floor(Math.random() * 20);
@@ -241,16 +268,8 @@ async function startSpin() {
     // 최종 위치로 이동
     slotReel.style.transform = `translateY(-${resultIndex * itemHeight}px)`;
 
-    // 결과 저장
-    results.assignments[selectedMember] = resultMonth;
-    if (!results.monthCounts[resultMonth]) {
-        results.monthCounts[resultMonth] = [];
-    }
-    results.monthCounts[resultMonth].push(selectedMember);
-    saveResults(results);
-
     // 결과 표시
-    setTimeout(() => {
+    setTimeout(async () => {
         spinSound.playWin();
         slotResult.innerHTML = `<span style="color: var(--secondary-color)">${selectedMember}</span> 님은 <span style="color: var(--success-color)">${resultMonth}</span> 담당!`;
 
@@ -266,9 +285,12 @@ async function startSpin() {
             selectedBtn.title = `${selectedMember}: ${resultMonth} 배정됨`;
         }
 
+        // 서버에서 최신 결과 다시 조회
+        const results = await getResults();
         renderMonthStatus(results);
 
         // 상태 리셋
+        const completedMember = selectedMember;
         selectedMember = null;
         document.getElementById('selectedMemberName').textContent = '-';
         isSpinning = false;
@@ -319,6 +341,5 @@ window.PLAYTOUR = {
     MONTHS,
     MEMBERS_PER_MONTH,
     getResults,
-    saveResults,
-    STORAGE_KEY
+    API_BASE
 };

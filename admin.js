@@ -1,11 +1,11 @@
-// 관리자 페이지 스크립트
+// 관리자 페이지 스크립트 (서버 DB 연동)
+
+const ADMIN_PASSWORD = 'playtour2024!';
 
 document.addEventListener('DOMContentLoaded', initAdminPage);
 
-function initAdminPage() {
-    renderSummary();
-    renderResultTable();
-    renderMemberStatus();
+async function initAdminPage() {
+    await refreshData();
 
     // 버튼 이벤트 바인딩
     document.getElementById('downloadBtn').addEventListener('click', downloadExcel);
@@ -13,10 +13,17 @@ function initAdminPage() {
     document.getElementById('backupBtn').addEventListener('click', backupToFormspree);
 }
 
+// 데이터 새로고침
+async function refreshData() {
+    const results = await window.PLAYTOUR.getResults();
+    renderSummary(results);
+    renderResultTable(results);
+    renderMemberStatus(results);
+}
+
 // 요약 카드 렌더링
-function renderSummary() {
-    const results = window.PLAYTOUR.getResults();
-    const { MEMBERS, MONTHS } = window.PLAYTOUR;
+function renderSummary(results) {
+    const { MEMBERS } = window.PLAYTOUR;
 
     const totalMembers = MEMBERS.length;
     const assignedMembers = Object.keys(results.assignments).length;
@@ -48,8 +55,7 @@ function renderSummary() {
 }
 
 // 결과 테이블 렌더링
-function renderResultTable() {
-    const results = window.PLAYTOUR.getResults();
+function renderResultTable(results) {
     const { MONTHS, MEMBERS_PER_MONTH } = window.PLAYTOUR;
 
     const tbody = document.getElementById('resultTableBody');
@@ -71,8 +77,7 @@ function renderResultTable() {
 }
 
 // 멤버별 상태 렌더링
-function renderMemberStatus() {
-    const results = window.PLAYTOUR.getResults();
+function renderMemberStatus(results) {
     const { MEMBERS } = window.PLAYTOUR;
 
     const grid = document.getElementById('memberStatusGrid');
@@ -91,8 +96,8 @@ function renderMemberStatus() {
 }
 
 // 엑셀 다운로드 (CSV 형식)
-function downloadExcel() {
-    const results = window.PLAYTOUR.getResults();
+async function downloadExcel() {
+    const results = await window.PLAYTOUR.getResults();
     const { MONTHS, MEMBERS_PER_MONTH, MEMBERS } = window.PLAYTOUR;
 
     // CSV 헤더
@@ -128,25 +133,41 @@ function downloadExcel() {
 }
 
 // 결과 초기화
-function resetResults() {
+async function resetResults() {
     if (!confirm('정말로 모든 추첨 결과를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
         return;
     }
 
-    if (!confirm('한 번 더 확인합니다. 초기화하시겠습니까?')) {
+    const password = prompt('관리자 비밀번호를 입력하세요:');
+    if (!password) {
         return;
     }
 
-    localStorage.removeItem(window.PLAYTOUR.STORAGE_KEY);
-    alert('초기화가 완료되었습니다.');
+    try {
+        const response = await fetch(`${window.PLAYTOUR.API_BASE}/reset`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+        });
 
-    // 페이지 새로고침
-    location.reload();
+        const data = await response.json();
+
+        if (data.success) {
+            alert('초기화가 완료되었습니다.');
+            await refreshData();
+        } else {
+            alert(data.error || '초기화에 실패했습니다.');
+        }
+    } catch (error) {
+        alert('오류가 발생했습니다: ' + error.message);
+    }
 }
 
 // Formspree 백업
-function backupToFormspree() {
-    const results = window.PLAYTOUR.getResults();
+async function backupToFormspree() {
+    const results = await window.PLAYTOUR.getResults();
     const { MONTHS, MEMBERS } = window.PLAYTOUR;
 
     // 결과를 보기 좋게 정리
@@ -192,9 +213,5 @@ function backupToFormspree() {
     }
 }
 
-// 자동 새로고침 (5초마다)
-setInterval(() => {
-    renderSummary();
-    renderResultTable();
-    renderMemberStatus();
-}, 5000);
+// 자동 새로고침 (10초마다)
+setInterval(refreshData, 10000);

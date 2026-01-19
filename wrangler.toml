@@ -1,0 +1,8 @@
+name = "playtour"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "playtour-db"
+database_id = "b56e4440-e7ba-44ca-a270-0c5572d530ef"
