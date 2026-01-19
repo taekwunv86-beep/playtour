@@ -1,0 +1,525 @@
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #f59e0b;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --bg-color: #0f172a;
+    --bg-light: #1e293b;
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Section styles */
+section {
+    background: var(--bg-light);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Member Grid */
+.member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 0.75rem;
+}
+
+.member-btn {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.member-btn:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.member-btn.selected {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.member-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--border-color);
+}
+
+.member-btn.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    opacity: 0.7;
+}
+
+/* Slot Machine */
+.slot-machine-section {
+    text-align: center;
+}
+
+.selected-member {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    display: inline-block;
+}
+
+.selected-member .label {
+    color: var(--text-muted);
+    margin-right: 0.5rem;
+}
+
+.selected-member .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.slot-machine {
+    margin: 2rem auto;
+    max-width: 300px;
+}
+
+.slot-window {
+    background: linear-gradient(180deg, #000 0%, #1a1a2e 50%, #000 100%);
+    border: 4px solid var(--secondary-color);
+    border-radius: 1rem;
+    height: 120px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.5),
+        0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+.slot-window::before,
+.slot-window::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 30px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.slot-window::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+
+.slot-window::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+.slot-reel {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.1s ease-out;
+}
+
+.slot-item {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text-color);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.slot-result {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-height: 2rem;
+    color: var(--success-color);
+}
+
+/* Spin Button */
+.spin-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.spin-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.spin-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spin-button.spinning {
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Month Status */
+.month-status {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.month-card {
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.month-card .month-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.month-card .month-count {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.month-card .month-target {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.month-card .member-list {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.admin-link, .back-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+
+.admin-link:hover, .back-link:hover {
+    color: var(--secondary-color);
+}
+
+/* ========== Admin Page Styles ========== */
+.admin-page section {
+    margin-bottom: 2rem;
+}
+
+/* Summary Cards */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.summary-card {
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.summary-card .card-title {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.summary-card .card-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.summary-card .card-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Result Table */
+.table-container {
+    overflow-x: auto;
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.result-table th,
+.result-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-table th {
+    background: var(--primary-dark);
+    font-weight: bold;
+    color: white;
+}
+
+.result-table tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.result-table td {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Member Status Grid */
+.member-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+}
+
+.member-status-item {
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.member-status-item .member-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.member-status-item .member-month {
+    font-size: 0.85rem;
+    color: var(--success-color);
+}
+
+.member-status-item.pending .member-month {
+    color: var(--text-muted);
+}
+
+/* Admin Actions */
+.admin-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.action-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.download-btn {
+    background: var(--success-color);
+    color: white;
+}
+
+.download-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.reset-btn {
+    background: var(--danger-color);
+    color: white;
+}
+
+.reset-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.backup-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.backup-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.75rem;
+    }
+
+    .member-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .spin-button {
+        padding: 0.75rem 2rem;
+        font-size: 1.25rem;
+    }
+
+    .month-status {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .admin-actions {
+        flex-direction: column;
+    }
+
+    .action-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Confetti animation container */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}

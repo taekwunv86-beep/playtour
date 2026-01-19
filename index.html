@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>플레이투어 추첨 프로그램</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>플레이투어 추첨 프로그램</h1>
+            <p class="subtitle">2, 4, 5, 6, 8, 11월 담당 멤버 추첨</p>
+        </header>
+
+        <main>
+            <!-- 멤버 선택 섹션 -->
+            <section class="member-selection">
+                <h2>멤버 선택</h2>
+                <div class="member-grid" id="memberGrid">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+            </section>
+
+            <!-- 슬롯머신 섹션 -->
+            <section class="slot-machine-section">
+                <div class="selected-member" id="selectedMemberDisplay">
+                    <span class="label">선택된 멤버:</span>
+                    <span class="value" id="selectedMemberName">-</span>
+                </div>
+
+                <div class="slot-machine">
+                    <div class="slot-window">
+                        <div class="slot-reel" id="slotReel">
+                            <div class="slot-item">2월</div>
+                            <div class="slot-item">4월</div>
+                            <div class="slot-item">5월</div>
+                            <div class="slot-item">6월</div>
+                            <div class="slot-item">8월</div>
+                            <div class="slot-item">11월</div>
+                        </div>
+                    </div>
+                    <div class="slot-result" id="slotResult"></div>
+                </div>
+
+                <button class="spin-button" id="spinButton" disabled>
+                    <span class="button-text">추첨하기</span>
+                    <span class="button-icon">🎰</span>
+                </button>
+            </section>
+
+            <!-- 현재 추첨 현황 -->
+            <section class="status-section">
+                <h2>추첨 현황</h2>
+                <div class="month-status" id="monthStatus">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <a href="admin.html" class="admin-link">관리자 페이지</a>
+        </footer>
+    </div>
+
+    <!-- 오디오 요소 -->
+    <audio id="spinSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleOPh4N/e3t7e4OHi4+Tk5OXl5eXl5OPi4N7b2NTQzcrIx8fIycvO0dXZ3eDj5efn5+bl4+Hf3NnW09HPzs3Nzc7P0dPW2dze4ePl5ufn5+Xk4uDd29jV0tDOzc3Nzc7P0dPW2Nve4ePl5+fn5+Xk4uDd29jV0tDOzc3Nzc7P0dTW2dze4ePl5+fn5+Xk4uDd29jV0tDOzc3Nzc7P0dTX2t3g4+Xn5+fn5eTi4N7b2NXS0M7Nzc3Nzs/R1NfZ3eDj5efn5+fl5OLg3dvY1dLQzs3Nzc3Oz9HU19rd4OPl5+fn5+Xk4uDe29jV0tDOzc3Nzc7P0dTX2t3g4+Xn5+fn5eTi4N7b2NXS0M7Nzc3Nzs/R1NfZ3eDj5efn5+fl5OLg3tvY1dLQzs3Nzc3Oz9HU19rd4OPl5+fn5+Xk4uDe29jV0tDOzc3Nzc7P0dTX2t3g4+Xn5+fn5eTi4N7b2NXS0M7Nzc3Nzs/R1NfZ3eDj5efn" type="audio/wav">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
